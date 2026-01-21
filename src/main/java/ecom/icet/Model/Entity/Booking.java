@@ -35,7 +35,7 @@ public class Booking {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "driver_id", nullable = true)
+    @JoinColumn(name = "driver_id")
     private Driver driver;
 
 }
