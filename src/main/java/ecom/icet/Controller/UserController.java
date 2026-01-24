@@ -44,4 +44,24 @@ public class UserController {
             return ResponseEntity.status(401).body("Invalid Credentials");
         }
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        UserDto updatedUser = userService.updateUser(id, userDto);
+        if (updatedUser != null) {
+            return ResponseEntity.ok(updatedUser);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok("User Deleted Successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("User Not Found");
+        }
+    }
 }

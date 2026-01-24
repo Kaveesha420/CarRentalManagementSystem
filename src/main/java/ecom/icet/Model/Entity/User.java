@@ -22,4 +22,7 @@ public class User {
     private String email;
     @Column(nullable = false)
     private String role;
+
+    @Column(columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean isActive = true;
 }
