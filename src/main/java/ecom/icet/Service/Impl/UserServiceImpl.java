@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean validateUser(String username, String password) {
-        Optional<User> user = userRepository.findByName(username);
+        Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             return user.get().getPassword().equals(password);
         }
