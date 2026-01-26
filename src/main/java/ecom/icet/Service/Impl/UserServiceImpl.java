@@ -44,10 +44,48 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean validateUser(String username, String password) {
-        Optional<User> user = userRepository.findByName(username);
+        Optional<User> user = userRepository.findByUsername(username);
+
         if (user.isPresent()) {
+            if (user.get().getIsActive() == Boolean.FALSE) {
+                return false;
+            }
             return user.get().getPassword().equals(password);
         }
         return false;
+    }
+
+    @Override
+    public UserDto updateUser(Long id, UserDto userDto) {
+        Optional<User> existingUserOptional = userRepository.findById(id);
+
+        if (existingUserOptional.isPresent()) {
+            User user = existingUserOptional.get();
+
+            user.setUsername(userDto.getUsername());
+            user.setEmail(userDto.getEmail());
+            user.setRole(userDto.getRole());
+
+            if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+                user.setPassword(userDto.getPassword());
+            }
+
+            User savedUser = userRepository.save(user);
+            return mapper.convertValue(savedUser, UserDto.class);
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setIsActive(false);
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
     }
 }
