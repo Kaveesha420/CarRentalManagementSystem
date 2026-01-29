@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class DriverDto {
-    private Long id;
+    private String id;
 
     @NotBlank(message = "Driver name is required")
     private String name;

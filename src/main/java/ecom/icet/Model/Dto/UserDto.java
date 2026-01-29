@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class UserDto {
-        private Long id;
+        private String id;
 
         @NotBlank(message = "Username is required")
         private String username;

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class CustomerDto {
-        private Long id;
+        private String id;
 
         @NotBlank(message = "Name is required")
         private String name;

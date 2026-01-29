@@ -14,8 +14,7 @@ import java.time.LocalDate;
 public class Booking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     private LocalDate pickupDate;
     private LocalDate returnDate;
     private Double totalPrice;

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class CarDto {
-    private Long id;
+    private String id;
 
     @NotBlank(message = "Brand is required")
     private String brand;

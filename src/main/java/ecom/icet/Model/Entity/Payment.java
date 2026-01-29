@@ -13,8 +13,7 @@ import java.time.LocalDate;
 @Entity
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     @Column(nullable = false)
     private Double amount;
     @Column(nullable = false)

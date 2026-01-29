@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 public class PaymentDto {
-    private Long id;
+    private String id;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Double amount;
@@ -25,6 +25,6 @@ public class PaymentDto {
     private String paymentMethod;
 
     @NotBlank(message = "Booking Id is required")
-    private Long bookingId;
+    private String bookingId;
 
 }
