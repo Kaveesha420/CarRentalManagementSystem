@@ -27,12 +27,12 @@ public class BookingController {
     }
 
     @GetMapping("/getCustomerById/{id}")
-    public ResponseEntity<List<BookingDto>> getBookingsByCustomerId(@PathVariable Long id) {
+    public ResponseEntity<List<BookingDto>> getBookingsByCustomerId(@PathVariable String id) {
         return ResponseEntity.ok(bookingService.getBookingsByCustomerId(id));
     }
 
     @PutMapping("/updateStatus/{id}/{status}")
-    public ResponseEntity<BookingDto> updateBookingStatus(@PathVariable Long id, @PathVariable String status) {
+    public ResponseEntity<BookingDto> updateBookingStatus(@PathVariable String id, @PathVariable String status) {
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, status));
     }
 }
