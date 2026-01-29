@@ -8,6 +8,6 @@ public interface DriverService {
     DriverDto addDriver(DriverDto driverDto);
     List<DriverDto> getAllDrivers();
     List<DriverDto> getAvailableDrivers();
-    DriverDto updateDriver(Long id, DriverDto driverDto);
-    void deleteDriver(Long id);
+    DriverDto updateDriver(String id, DriverDto driverDto);
+    void deleteDriver(String id);
 }

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class CustomerDto {
-        private Long id;
+        private String id;
 
         @NotBlank(message = "Name is required")
         private String name;
@@ -24,7 +24,7 @@ public class CustomerDto {
         private String email;
 
         @Pattern(regexp = "^\\d{10}$", message = "Contact number must be exactly 10 digits")
-        private String contactNumber;
+        private String contactNo;
 
         @NotBlank(message = "Nic is required")
         private String nic;

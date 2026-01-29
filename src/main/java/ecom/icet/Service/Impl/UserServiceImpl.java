@@ -5,6 +5,7 @@ import ecom.icet.Model.Dto.UserDto;
 import ecom.icet.Model.Entity.User;
 import ecom.icet.Repository.UserRepository;
 import ecom.icet.Service.UserService;
+import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(UserDto userDto) {
         User user = mapper.convertValue(userDto, User.class);
+
+        User lastUser = userRepository.findFirstByOrderByIdDesc();
+        String lastId = (lastUser != null) ? lastUser.getId() : null;
+        user.setId(IdGenerator.generateNextId(lastId, "USR"));
+
+        user.setIsActive(true);
         User savedUser = userRepository.save(user);
         return mapper.convertValue(savedUser, UserDto.class);
     }
@@ -31,13 +38,15 @@ public class UserServiceImpl implements UserService {
         List<User> userList = userRepository.findAll();
         List<UserDto> userDtoList = new ArrayList<>();
         for (User user : userList) {
-            userDtoList.add(mapper.convertValue(user, UserDto.class));
+            if(user.getIsActive()){
+                userDtoList.add(mapper.convertValue(user, UserDto.class));
+            }
         }
         return userDtoList;
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserDto getUserById(String id) {
         Optional<User> user = userRepository.findById(id);
         return user.map(value -> mapper.convertValue(value, UserDto.class)).orElse(null);
     }
@@ -56,7 +65,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(Long id, UserDto userDto) {
+    public UserDto updateUser(String id, UserDto userDto) {
         Optional<User> existingUserOptional = userRepository.findById(id);
 
         if (existingUserOptional.isPresent()) {
@@ -77,7 +86,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(String id) {
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isPresent()) {

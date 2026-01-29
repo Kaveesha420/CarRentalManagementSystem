@@ -7,8 +7,8 @@ import java.util.List;
 public interface UserService {
     UserDto addUser(UserDto userDto);
     List<UserDto> getAllUsers();
-    UserDto getUserById(Long id);
+    UserDto getUserById(String id);
     Boolean validateUser(String username, String password);
-    UserDto updateUser(Long id, UserDto userDto);
-    void deleteUser(Long id);
+    UserDto updateUser(String id, UserDto userDto);
+    void deleteUser(String id);
 }

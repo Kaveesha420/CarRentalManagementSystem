@@ -5,6 +5,7 @@ import ecom.icet.Model.Dto.DriverDto;
 import ecom.icet.Model.Entity.Driver;
 import ecom.icet.Repository.DriverRepository;
 import ecom.icet.Service.DriverService;
+import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public DriverDto addDriver(DriverDto driverDto) {
         Driver driver = mapper.convertValue(driverDto, Driver.class);
+
+        Driver lastDriver = driverRepository.findFirstByOrderByIdDesc();
+        String lastId = (lastDriver != null) ? lastDriver.getId() : null;
+        driver.setId(IdGenerator.generateNextId(lastId, "DRV"));
+
         Driver savedDriver = driverRepository.save(driver);
         return mapper.convertValue(savedDriver, DriverDto.class);
     }
@@ -47,7 +53,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverDto updateDriver(Long id, DriverDto driverDto) {
+    public DriverDto updateDriver(String id, DriverDto driverDto) {
         Optional<Driver> exsistingDriver = driverRepository.findById(id);
         if (exsistingDriver.isPresent()){
             Driver driver = exsistingDriver.get();
@@ -55,8 +61,7 @@ public class DriverServiceImpl implements DriverService {
             driver.setName(driverDto.getName());
             driver.setStatus(driverDto.getStatus());
             driver.setContactNo(driverDto.getContactNo());
-            driver.setLicenseNo(driverDto.getLicenseNo());
-
+//            driver.setLicenseNo(driverDto.getLicenseNo());
             Driver updateDriver = driverRepository.save(driver);
             return mapper.convertValue(updateDriver, DriverDto.class);
         }
@@ -64,7 +69,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void deleteDriver(Long id) {
+    public void deleteDriver(String id) {
         driverRepository.deleteById(id);
     }
 }

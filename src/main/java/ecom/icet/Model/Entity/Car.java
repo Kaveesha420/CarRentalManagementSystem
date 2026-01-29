@@ -14,8 +14,7 @@ import lombok.*;
 public class Car {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     @Column(nullable = false)
     private String brand;
     @Column(nullable = false)

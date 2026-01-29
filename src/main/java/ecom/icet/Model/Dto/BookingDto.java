@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @ToString
 public class BookingDto {
-    private Long id;
+    private String id;
 
     @NotNull(message = "Pickup date is required")
     @FutureOrPresent(message = "Pickup date must be today or in the future")
@@ -26,11 +26,11 @@ public class BookingDto {
     private Boolean withDriver;
 
     @NotNull(message = "Car ID is required")
-    private Long carId;
+    private String carId;
 
     @NotNull(message = "Customer ID is required")
-    private Long customerId;
+    private String customerId;
 
-    private Long driverId;
-    private Long userId;
+    private String driverId;
+    private String userId;
 }
