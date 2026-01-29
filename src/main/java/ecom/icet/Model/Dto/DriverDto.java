@@ -17,7 +17,6 @@ public class DriverDto {
     private String name;
 
     @NotBlank(message = "License number is required")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String licenseNo;
 
     @Pattern(regexp = "^\\d{10}$", message = "Contact number must be exactly 10 digits")

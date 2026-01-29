@@ -24,7 +24,7 @@ public class CustomerDto {
         private String email;
 
         @Pattern(regexp = "^\\d{10}$", message = "Contact number must be exactly 10 digits")
-        private String contactNumber;
+        private String contactNo;
 
         @NotBlank(message = "Nic is required")
         private String nic;

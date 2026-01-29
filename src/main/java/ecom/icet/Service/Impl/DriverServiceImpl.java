@@ -61,7 +61,7 @@ public class DriverServiceImpl implements DriverService {
             driver.setName(driverDto.getName());
             driver.setStatus(driverDto.getStatus());
             driver.setContactNo(driverDto.getContactNo());
-
+//            driver.setLicenseNo(driverDto.getLicenseNo());
             Driver updateDriver = driverRepository.save(driver);
             return mapper.convertValue(updateDriver, DriverDto.class);
         }

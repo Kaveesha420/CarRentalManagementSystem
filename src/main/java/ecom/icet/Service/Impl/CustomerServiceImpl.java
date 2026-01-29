@@ -3,7 +3,9 @@ package ecom.icet.Service.Impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ecom.icet.Model.Dto.CustomerDto;
 import ecom.icet.Model.Entity.Customer;
+import ecom.icet.Model.Entity.User;
 import ecom.icet.Repository.CustomerRepository;
+import ecom.icet.Repository.UserRepository;
 import ecom.icet.Service.CustomerService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +20,21 @@ import java.util.Optional;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
     private final ObjectMapper mapper;
 
     @Override
     public CustomerDto addCustomer(CustomerDto customerDto) {
         Customer customer = mapper.convertValue(customerDto, Customer.class);
+
+        if (customer.getUser() != null) {
+            User lastUser = userRepository.findFirstByOrderByIdDesc();
+            String lastUserId = (lastUser != null) ? lastUser.getId() : null;
+
+            String newUserId = IdGenerator.generateNextId(lastUserId, "USR");
+            customer.getUser().setId(newUserId);
+            customer.getUser().setIsActive(true);
+        }
 
         Customer lastCustomer = customerRepository.findFirstByOrderByIdDesc();
 
@@ -61,7 +73,7 @@ public class CustomerServiceImpl implements CustomerService {
             Customer customer = existing.get();
             customer.setName(customerDto.getName());
             customer.setAddress(customerDto.getAddress());
-            customer.setContactNo(customerDto.getContactNumber());
+            customer.setContactNo(customerDto.getContactNo());
             customer.setNic(customerDto.getNic());
 
             Customer updated = customerRepository.save(customer);
