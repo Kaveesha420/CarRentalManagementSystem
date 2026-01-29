@@ -2,6 +2,7 @@ package ecom.icet.Controller;
 
 import ecom.icet.Model.Dto.BookingDto;
 import ecom.icet.Service.BookingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping("/add")
-    public ResponseEntity<BookingDto> addBooking(@RequestBody BookingDto bookingDto) {
+    public ResponseEntity<BookingDto> addBooking(@Valid @RequestBody BookingDto bookingDto) {
         return ResponseEntity.ok(bookingService.addBooking(bookingDto));
     }
 

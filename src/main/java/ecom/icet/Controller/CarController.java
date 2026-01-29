@@ -2,6 +2,7 @@ package ecom.icet.Controller;
 
 import ecom.icet.Model.Dto.CarDto;
 import ecom.icet.Service.CarService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class CarController {
     private final CarService carService;
 
     @PostMapping("/add")
-    public ResponseEntity<CarDto> addCar(@RequestBody CarDto carDto){
+    public ResponseEntity<CarDto> addCar(@Valid @RequestBody CarDto carDto){
         return ResponseEntity.ok(carService.addCar(carDto));
     }
 
@@ -32,7 +33,7 @@ public class CarController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<CarDto> updateCar(@PathVariable Long id, @RequestBody CarDto carDto){
+    public ResponseEntity<CarDto> updateCar(@PathVariable Long id,@Valid @RequestBody CarDto carDto){
         return ResponseEntity.ok(carService.updateCar(id, carDto));
     }
 
