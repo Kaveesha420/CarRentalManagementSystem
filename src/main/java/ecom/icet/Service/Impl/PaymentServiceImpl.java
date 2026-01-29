@@ -10,6 +10,7 @@ import ecom.icet.Service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +29,9 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = bookingRepository.findById(paymentDto.getBookingId()).orElseThrow(()->new RuntimeException("Booking not found"));
 
         payment.setBooking(booking);
-        payment.setPaymentDate(paymentDto.getPaymentDate());
+        payment.setPaymentDate(LocalDate.now());
         payment.setPaymentMethod(paymentDto.getPaymentMethod());
-        payment.setAmount(paymentDto.getAmount());
+        payment.setAmount(booking.getTotalPrice());
 
         Payment savedPayment = paymentRepository.save(payment);
         return mapper.convertValue(savedPayment, PaymentDto.class);
