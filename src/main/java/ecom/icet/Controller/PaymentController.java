@@ -2,6 +2,7 @@ package ecom.icet.Controller;
 
 import ecom.icet.Model.Dto.PaymentDto;
 import ecom.icet.Service.PaymentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/add")
-    public ResponseEntity<PaymentDto> addPayment(@RequestBody PaymentDto paymentDto) {
+    public ResponseEntity<PaymentDto> addPayment(@Valid @RequestBody PaymentDto paymentDto) {
         return ResponseEntity.ok(paymentService.addPayment(paymentDto));
     }
 

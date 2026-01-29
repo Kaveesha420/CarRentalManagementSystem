@@ -2,6 +2,7 @@ package ecom.icet.Controller;
 
 import ecom.icet.Model.Dto.CustomerDto;
 import ecom.icet.Service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/add")
-    public ResponseEntity<CustomerDto> addCustomer(@RequestBody CustomerDto customerDto){
+    public ResponseEntity<CustomerDto> addCustomer(@Valid @RequestBody CustomerDto customerDto){
         return ResponseEntity.ok(customerService.addCustomer(customerDto));
     }
 
@@ -31,7 +32,7 @@ public class CustomerController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Long id, @RequestBody CustomerDto customerDto) {
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Long id,@Valid @RequestBody CustomerDto customerDto) {
         return ResponseEntity.ok(customerService.updateCustomer(id, customerDto));
     }
 

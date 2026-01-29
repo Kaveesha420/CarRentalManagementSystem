@@ -2,6 +2,7 @@ package ecom.icet.Controller;
 
 import ecom.icet.Model.Dto.DriverDto;
 import ecom.icet.Service.DriverService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class DriverController {
     private final DriverService driverService;
 
     @PostMapping("/add")
-    public ResponseEntity<DriverDto> addDriver(@RequestBody DriverDto driverDto){
+    public ResponseEntity<DriverDto> addDriver(@Valid @RequestBody DriverDto driverDto){
         return ResponseEntity.ok(driverService.addDriver(driverDto));
     }
 
@@ -32,7 +33,7 @@ public class DriverController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<DriverDto> updateDriver(@PathVariable Long id,@RequestBody DriverDto driverDto){
+    public ResponseEntity<DriverDto> updateDriver(@PathVariable Long id,@Valid @RequestBody DriverDto driverDto){
         return ResponseEntity.ok(driverService.updateDriver(id, driverDto));
     }
 

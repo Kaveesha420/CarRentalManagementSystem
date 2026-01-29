@@ -7,6 +7,7 @@ import ecom.icet.Repository.*;
 import ecom.icet.Service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class BookingServiceImpl implements BookingService {
     private final ObjectMapper mapper;
 
     @Override
+    @Transactional
     public BookingDto addBooking(BookingDto bookingDto) {
         Booking booking = new Booking();
 
