@@ -1,7 +1,8 @@
 package ecom.icet.Model.Dto;
 
 import lombok.*;
-
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter
@@ -11,14 +12,25 @@ import java.time.LocalDate;
 @ToString
 public class BookingDto {
     private Long id;
+
+    @NotNull(message = "Pickup date is required")
+    @FutureOrPresent(message = "Pickup date must be today or in the future")
     private LocalDate pickupDate;
+
+    @NotNull(message = "Return date is required")
+    @FutureOrPresent(message = "Return date must be today or in the future")
     private LocalDate returnDate;
+
     private Double totalPrice;
     private String bookingStatus;
     private Boolean withDriver;
 
+    @NotNull(message = "Car ID is required")
     private Long carId;
+
+    @NotNull(message = "Customer ID is required")
     private Long customerId;
+
     private Long driverId;
     private Long userId;
 }
