@@ -5,6 +5,7 @@ import ecom.icet.Model.Dto.CarDto;
 import ecom.icet.Model.Entity.Car;
 import ecom.icet.Repository.CarRepository;
 import ecom.icet.Service.CarService;
+import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,11 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarDto addCar(CarDto carDto) {
         Car car = objectMapper.convertValue(carDto, Car.class);
+
+        Car lastCar = carRepository.findFirstByOrderByIdDesc();
+        String lastId = (lastCar != null) ? lastCar.getId() : null;
+        car.setId(IdGenerator.generateNextId(lastId, "CAR"));
+
         Car savedCar = carRepository.save(car);
         return objectMapper.convertValue(savedCar, CarDto.class);
     }
@@ -38,18 +44,18 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto getCarById(Long id) {
+    public CarDto getCarById(String id) {
         Optional<Car> car = carRepository.findById(id);
         return car.map(value -> objectMapper.convertValue(value, CarDto.class)).orElse(null);
     }
 
     @Override
-    public void deleteCar(Long id) {
+    public void deleteCar(String id) {
         carRepository.deleteById(id);
     }
 
     @Override
-    public CarDto updateCar(Long id, CarDto carDto) {
+    public CarDto updateCar(String id, CarDto carDto) {
         Optional<Car> existingCar = carRepository.findById(id);
 
         if (existingCar.isPresent()){

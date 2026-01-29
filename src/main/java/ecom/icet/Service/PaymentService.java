@@ -7,5 +7,5 @@ import java.util.List;
 public interface PaymentService {
     PaymentDto addPayment(PaymentDto paymentDto);
     List<PaymentDto> getAllPayments();
-    PaymentDto getPaymentByBookingId(Long bookingId);
+    PaymentDto getPaymentByBookingId(String bookingId);
 }

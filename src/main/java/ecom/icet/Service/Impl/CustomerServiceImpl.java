@@ -5,6 +5,7 @@ import ecom.icet.Model.Dto.CustomerDto;
 import ecom.icet.Model.Entity.Customer;
 import ecom.icet.Repository.CustomerRepository;
 import ecom.icet.Service.CustomerService;
+import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,15 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDto addCustomer(CustomerDto customerDto) {
         Customer customer = mapper.convertValue(customerDto, Customer.class);
+
+        Customer lastCustomer = customerRepository.findFirstByOrderByIdDesc();
+
+        String lastId = (lastCustomer != null) ? lastCustomer.getId() : null;
+
+        String newId = IdGenerator.generateNextId(lastId, "CUS");
+
+        customer.setId(newId);
+
         Customer savedCustomer = customerRepository.save(customer);
         return mapper.convertValue(savedCustomer, CustomerDto.class);
     }
@@ -38,14 +48,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDto getCustomerById(Long id) {
+    public CustomerDto getCustomerById(String id) {
         return customerRepository.findById(id)
                 .map(customer -> mapper.convertValue(customer, CustomerDto.class))
                 .orElse(null);
     }
 
     @Override
-    public CustomerDto updateCustomer(Long id, CustomerDto customerDto) {
+    public CustomerDto updateCustomer(String id, CustomerDto customerDto) {
         Optional<Customer> existing = customerRepository.findById(id);
         if (existing.isPresent()){
             Customer customer = existing.get();
@@ -61,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void deleteCustomer(Long id) {
+    public void deleteCustomer(String id) {
         customerRepository.deleteById(id);
     }
 }

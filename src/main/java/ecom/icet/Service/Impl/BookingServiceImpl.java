@@ -5,6 +5,7 @@ import ecom.icet.Model.Dto.BookingDto;
 import ecom.icet.Model.Entity.*;
 import ecom.icet.Repository.*;
 import ecom.icet.Service.BookingService;
+import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +31,15 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto addBooking(BookingDto bookingDto) {
         Booking booking = new Booking();
 
-        Car car = carRepository.findById(bookingDto.getCarId()).orElseThrow(()->new RuntimeException("Car not found"));
-        Customer customer = customerRepository.findById(bookingDto.getCustomerId()).orElseThrow(()->new RuntimeException("Customer not found"));
-        User user = userRepository.findById(bookingDto.getUserId()).orElseThrow(()->new RuntimeException("User not found"));
+        Car car = carRepository.findById(bookingDto.getCarId()).orElseThrow(() -> new RuntimeException("Car not found"));
+        Customer customer = customerRepository.findById(bookingDto.getCustomerId()).orElseThrow(() -> new RuntimeException("Customer not found"));
+        User user = userRepository.findById(bookingDto.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
 
         booking.setCar(car);
         booking.setCustomer(customer);
         booking.setUser(user);
 
-        if (bookingDto.getDriverId() != null){
+        if (bookingDto.getDriverId() != null && !bookingDto.getDriverId().isEmpty()) {
             Driver driver = driverRepository.findById(bookingDto.getDriverId()).orElse(null);
             booking.setDriver(driver);
         }
@@ -48,9 +49,12 @@ public class BookingServiceImpl implements BookingService {
         booking.setWithDriver(bookingDto.getWithDriver());
         booking.setBookingStatus("PENDING");
 
-        long days = ChronoUnit.DAYS.between(bookingDto.getPickupDate(),bookingDto.getReturnDate());
-        Double totalPrice = days * car.getPricePerDay();
-        booking.setTotalPrice(totalPrice);
+        long days = ChronoUnit.DAYS.between(bookingDto.getPickupDate(), bookingDto.getReturnDate());
+        booking.setTotalPrice(days * car.getPricePerDay());
+
+        Booking lastBooking = bookingRepository.findFirstByOrderByIdDesc();
+        String lastId = (lastBooking != null) ? lastBooking.getId() : null;
+        booking.setId(IdGenerator.generateNextId(lastId, "BKG"));
 
         Booking savedBooking = bookingRepository.save(booking);
         return mapper.convertValue(savedBooking, BookingDto.class);
@@ -69,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingsByCustomerId(Long customerId) {
+    public List<BookingDto> getBookingsByCustomerId(String customerId) {
         List<Booking> bookings = bookingRepository.findByCustomerId(customerId);
         List<BookingDto> dtoList = new ArrayList<>();
 
@@ -80,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto updateBookingStatus(Long id, String status) {
+    public BookingDto updateBookingStatus(String id, String status) {
         Optional<Booking> bookingOptional = bookingRepository.findById(id);
         if (bookingOptional.isPresent()){
             Booking booking = bookingOptional.get();

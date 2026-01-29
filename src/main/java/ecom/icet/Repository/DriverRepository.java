@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DriverRepository extends JpaRepository<Driver,Long> {
+public interface DriverRepository extends JpaRepository<Driver,String> {
+    Driver findFirstByOrderByIdDesc();
     List<Driver> findByStatus(String status);
 }
