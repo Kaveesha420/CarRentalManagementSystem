@@ -2,6 +2,7 @@ package ecom.icet.Model.Dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -24,7 +25,7 @@ public class CarDto {
     @Min(value = 1, message = "Seating capacity must be at least 1")
     private int seatingCapacity;
 
-    @NotBlank(message = "PricePerDay is required")
+    @NotNull(message = "PricePerDay is required")
     @Min(value = 1000, message = "Price must be at least 1000")
     private double pricePerDay;
 
