@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ecom.icet.Model.Dto.BookingDto;
 import ecom.icet.Model.Entity.*;
 import ecom.icet.Repository.*;
+import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.BookingService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +27,29 @@ public class BookingServiceImpl implements BookingService {
     private final CarRepository carRepository;
     private final DriverRepository driverRepository;
     private final ObjectMapper mapper;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional
     public BookingDto addBooking(BookingDto bookingDto) {
+
+        boolean isCarBooked = bookingRepository.existsByCarIdAndDateRange(
+                bookingDto.getCarId(), bookingDto.getPickupDate(), bookingDto.getReturnDate()
+        );
+
+        if (isCarBooked) {
+            throw new RuntimeException("Car is already booked for the selected dates!");
+        }
+
+        if (bookingDto.getWithDriver() && bookingDto.getDriverId() != null) {
+            boolean isDriverBooked = bookingRepository.existsByDriverIdAndDateRange(
+                    bookingDto.getDriverId(), bookingDto.getPickupDate(), bookingDto.getReturnDate()
+            );
+            if (isDriverBooked) {
+                throw new RuntimeException("Selected Driver is unavailable for these dates!");
+            }
+        }
+
         Booking booking = new Booking();
 
         Car car = carRepository.findById(bookingDto.getCarId()).orElseThrow(() -> new RuntimeException("Car not found"));
@@ -47,6 +68,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setPickupDate(bookingDto.getPickupDate());
         booking.setReturnDate(bookingDto.getReturnDate());
         booking.setWithDriver(bookingDto.getWithDriver());
+        booking.setCreatedAt(LocalDateTime.now());
         booking.setBookingStatus("PENDING");
 
         long days = ChronoUnit.DAYS.between(bookingDto.getPickupDate(), bookingDto.getReturnDate());
@@ -57,6 +79,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setId(IdGenerator.generateNextId(lastId, "BKG"));
 
         Booking savedBooking = bookingRepository.save(booking);
+        auditLogService.logAction("CREATE", "New Booking placed: " + savedBooking.getId() + " for Car " + savedBooking.getCar().getId());
         return mapper.convertValue(savedBooking, BookingDto.class);
 
     }
@@ -90,6 +113,7 @@ public class BookingServiceImpl implements BookingService {
             Booking booking = bookingOptional.get();
             booking.setBookingStatus(status);
             Booking updated = bookingRepository.save(booking);
+            auditLogService.logAction("UPDATE", "Booking " + id + " status changed to " + status);
             return mapper.convertValue(updated, BookingDto.class);
         }
         return null;

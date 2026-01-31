@@ -2,6 +2,8 @@ package ecom.icet.Model.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -9,6 +11,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE customers SET is_deleted = true WHERE id=?")
+@Where(clause = "is_deleted = false")
 public class Customer {
 
     @Id
@@ -27,5 +31,8 @@ public class Customer {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 
 }

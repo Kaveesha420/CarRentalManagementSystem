@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -11,6 +13,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE cars SET is_deleted = true WHERE id=?")
+@Where(clause = "is_deleted = false")
 public class Car {
 
     @Id
@@ -26,7 +30,8 @@ public class Car {
     @Column(nullable = false)
     private double pricePerDay;
     private String imagePath;
-
     @Column(nullable = false)
     private String status;
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 }
