@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ecom.icet.Model.Dto.BookingDto;
 import ecom.icet.Model.Entity.*;
 import ecom.icet.Repository.*;
+import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.BookingService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class BookingServiceImpl implements BookingService {
     private final CarRepository carRepository;
     private final DriverRepository driverRepository;
     private final ObjectMapper mapper;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -57,6 +59,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setId(IdGenerator.generateNextId(lastId, "BKG"));
 
         Booking savedBooking = bookingRepository.save(booking);
+        auditLogService.logAction("CREATE", "New Booking placed: " + savedBooking.getId() + " for Car " + savedBooking.getCar().getId());
         return mapper.convertValue(savedBooking, BookingDto.class);
 
     }
@@ -90,6 +93,7 @@ public class BookingServiceImpl implements BookingService {
             Booking booking = bookingOptional.get();
             booking.setBookingStatus(status);
             Booking updated = bookingRepository.save(booking);
+            auditLogService.logAction("UPDATE", "Booking " + id + " status changed to " + status);
             return mapper.convertValue(updated, BookingDto.class);
         }
         return null;
