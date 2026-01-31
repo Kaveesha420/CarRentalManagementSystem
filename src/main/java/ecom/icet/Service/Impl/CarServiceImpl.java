@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ecom.icet.Model.Dto.CarDto;
 import ecom.icet.Model.Entity.Car;
 import ecom.icet.Repository.CarRepository;
+import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.CarService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final ObjectMapper objectMapper;
+    private final AuditLogService auditLogService;
 
     @Override
     public CarDto addCar(CarDto carDto) {
@@ -29,6 +31,7 @@ public class CarServiceImpl implements CarService {
         car.setId(IdGenerator.generateNextId(lastId, "CAR"));
 
         Car savedCar = carRepository.save(car);
+        auditLogService.logAction("CREATE", "Added new Car: " + savedCar.getBrand() + " " + savedCar.getModel() + " (" + savedCar.getId() + ")");
         return objectMapper.convertValue(savedCar, CarDto.class);
     }
 
@@ -51,7 +54,12 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public void deleteCar(String id) {
-        carRepository.deleteById(id);
+        if (carRepository.existsById(id)) {
+            carRepository.deleteById(id);
+            auditLogService.logAction("DELETE", "Deleted Car ID: " + id);
+        } else {
+            throw new IllegalArgumentException("Car not found");
+        }
     }
 
     @Override
@@ -70,6 +78,7 @@ public class CarServiceImpl implements CarService {
             carToUpdate.setStatus(carDto.getStatus());
 
             Car updatedCar = carRepository.save(carToUpdate);
+            auditLogService.logAction("updated","Updated Car ID: " + id);
             return objectMapper.convertValue(updatedCar, CarDto.class);
         }
         return null;
