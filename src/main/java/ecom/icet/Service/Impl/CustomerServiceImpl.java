@@ -6,6 +6,7 @@ import ecom.icet.Model.Entity.Customer;
 import ecom.icet.Model.Entity.User;
 import ecom.icet.Repository.CustomerRepository;
 import ecom.icet.Repository.UserRepository;
+import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.CustomerService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
     private final ObjectMapper mapper;
+    private final AuditLogService auditLogService;
 
     @Override
     public CustomerDto addCustomer(CustomerDto customerDto) {
@@ -45,6 +47,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setId(newId);
 
         Customer savedCustomer = customerRepository.save(customer);
+        auditLogService.logAction("CREATE", "Added new Customer: " + savedCustomer.getName() + " (" + savedCustomer.getId() + ")");
         return mapper.convertValue(savedCustomer, CustomerDto.class);
     }
 
@@ -77,6 +80,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setNic(customerDto.getNic());
 
             Customer updated = customerRepository.save(customer);
+            auditLogService.logAction("UPDATE", "Updated Customer details: " + id);
             return mapper.convertValue(updated, CustomerDto.class);
         }
         return null;
@@ -84,6 +88,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomer(String id) {
-        customerRepository.deleteById(id);
+        if (customerRepository.existsById(id)) {
+            customerRepository.deleteById(id);
+
+            auditLogService.logAction("DELETE", "Deleted Customer: " + id);
+        }
     }
 }
