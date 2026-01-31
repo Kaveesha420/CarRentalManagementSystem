@@ -11,10 +11,12 @@ import ecom.icet.Service.PaymentService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,16 +28,29 @@ public class PaymentServiceImpl implements PaymentService {
     private final AuditLogService auditLogService;
 
     @Override
+    @Transactional
     public PaymentDto addPayment(PaymentDto paymentDto) {
+        Optional<Payment> existingPayment = paymentRepository.findByBookingId(paymentDto.getBookingId());
+        if (existingPayment.isPresent()) {
+            throw new IllegalArgumentException("Payment already exists for Booking ID: " + paymentDto.getBookingId());
+        }
+
         Payment payment = new Payment();
 
         Booking booking = bookingRepository.findById(paymentDto.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
+        if ("CANCELLED".equals(booking.getBookingStatus())) {
+            throw new IllegalArgumentException("Booking is expired/cancelled. Please make a new booking.");
+        }
+
         payment.setBooking(booking);
         payment.setAmount(booking.getTotalPrice());
         payment.setPaymentDate(LocalDate.now());
         payment.setPaymentMethod(paymentDto.getPaymentMethod());
+
+        booking.setBookingStatus("CONFIRMED");
+        bookingRepository.save(booking);
 
         Payment lastPayment = paymentRepository.findFirstByOrderByIdDesc();
         String lastId = (lastPayment != null) ? lastPayment.getId() : null;

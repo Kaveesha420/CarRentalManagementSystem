@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,24 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto addBooking(BookingDto bookingDto) {
+
+        boolean isCarBooked = bookingRepository.existsByCarIdAndDateRange(
+                bookingDto.getCarId(), bookingDto.getPickupDate(), bookingDto.getReturnDate()
+        );
+
+        if (isCarBooked) {
+            throw new RuntimeException("Car is already booked for the selected dates!");
+        }
+
+        if (bookingDto.getWithDriver() && bookingDto.getDriverId() != null) {
+            boolean isDriverBooked = bookingRepository.existsByDriverIdAndDateRange(
+                    bookingDto.getDriverId(), bookingDto.getPickupDate(), bookingDto.getReturnDate()
+            );
+            if (isDriverBooked) {
+                throw new RuntimeException("Selected Driver is unavailable for these dates!");
+            }
+        }
+
         Booking booking = new Booking();
 
         Car car = carRepository.findById(bookingDto.getCarId()).orElseThrow(() -> new RuntimeException("Car not found"));
@@ -49,6 +68,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setPickupDate(bookingDto.getPickupDate());
         booking.setReturnDate(bookingDto.getReturnDate());
         booking.setWithDriver(bookingDto.getWithDriver());
+        booking.setCreatedAt(LocalDateTime.now());
         booking.setBookingStatus("PENDING");
 
         long days = ChronoUnit.DAYS.between(bookingDto.getPickupDate(), bookingDto.getReturnDate());

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -37,4 +38,6 @@ public class Booking {
     @JoinColumn(name = "driver_id")
     private Driver driver;
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 }
