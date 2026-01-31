@@ -6,6 +6,7 @@ import ecom.icet.Model.Entity.Booking;
 import ecom.icet.Model.Entity.Payment;
 import ecom.icet.Repository.BookingRepository;
 import ecom.icet.Repository.PaymentRepository;
+import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.PaymentService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final ObjectMapper mapper;
+    private final AuditLogService auditLogService;
 
     @Override
     public PaymentDto addPayment(PaymentDto paymentDto) {
@@ -40,6 +42,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setId(IdGenerator.generateNextId(lastId, "PAY"));
 
         Payment savedPayment = paymentRepository.save(payment);
+        auditLogService.logAction("CREATE", "Payment processed: " + savedPayment.getId() + " for Booking " + savedPayment.getBooking().getId());
         return mapper.convertValue(savedPayment, PaymentDto.class);
     }
 
