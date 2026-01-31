@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ecom.icet.Model.Dto.UserDto;
 import ecom.icet.Model.Entity.User;
 import ecom.icet.Repository.UserRepository;
+import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.UserService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ObjectMapper mapper;
+    private final AuditLogService auditLogService;
 
     @Override
     public UserDto addUser(UserDto userDto) {
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
         user.setIsActive(true);
         User savedUser = userRepository.save(user);
+        auditLogService.logAction("CREATE", "Registered new User: " + savedUser.getUsername());
         return mapper.convertValue(savedUser, UserDto.class);
     }
 
@@ -80,6 +83,7 @@ public class UserServiceImpl implements UserService {
             }
 
             User savedUser = userRepository.save(user);
+            auditLogService.logAction("UPDATE", "Updated User profile: " + savedUser.getUsername());
             return mapper.convertValue(savedUser, UserDto.class);
         }
         return null;
@@ -87,14 +91,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(String id) {
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            User u = user.get();
+            u.setIsActive(false);
+            userRepository.save(u);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setIsActive(false);
-            userRepository.save(user);
-        } else {
-            throw new RuntimeException("User not found");
+            auditLogService.logAction("DELETE", "Deactivated User: " + u.getUsername());
         }
     }
 }
