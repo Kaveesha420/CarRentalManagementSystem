@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ecom.icet.Model.Dto.DriverDto;
 import ecom.icet.Model.Entity.Driver;
 import ecom.icet.Repository.DriverRepository;
+import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.DriverService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class DriverServiceImpl implements DriverService {
 
     private final DriverRepository driverRepository;
     private final ObjectMapper mapper;
+    private final AuditLogService auditLogService;
 
     @Override
     public DriverDto addDriver(DriverDto driverDto) {
@@ -29,6 +31,7 @@ public class DriverServiceImpl implements DriverService {
         driver.setId(IdGenerator.generateNextId(lastId, "DRV"));
 
         Driver savedDriver = driverRepository.save(driver);
+        auditLogService.logAction("CREATE", "Added new Driver: " + savedDriver.getName());
         return mapper.convertValue(savedDriver, DriverDto.class);
     }
 
@@ -63,6 +66,7 @@ public class DriverServiceImpl implements DriverService {
             driver.setContactNo(driverDto.getContactNo());
 //            driver.setLicenseNo(driverDto.getLicenseNo());
             Driver updateDriver = driverRepository.save(driver);
+            auditLogService.logAction("UPDATE", "Updated Driver info: " + id);
             return mapper.convertValue(updateDriver, DriverDto.class);
         }
         return null;
@@ -70,6 +74,10 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public void deleteDriver(String id) {
-        driverRepository.deleteById(id);
+        if (driverRepository.existsById(id)) {
+            driverRepository.deleteById(id);
+
+            auditLogService.logAction("DELETE", "Deleted Driver: " + id);
+        }
     }
 }
