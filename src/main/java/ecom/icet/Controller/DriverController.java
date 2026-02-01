@@ -23,8 +23,8 @@ public class DriverController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<DriverDto>> getAllDrivers(){
-        return ResponseEntity.ok(driverService.getAllDrivers());
+    public ResponseEntity<List<DriverDto>> getAllDrivers(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(driverService.getAllDrivers(page, size));
     }
 
     @GetMapping("/getAvailable")
