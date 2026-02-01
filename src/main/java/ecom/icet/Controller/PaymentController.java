@@ -22,8 +22,8 @@ public class PaymentController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<PaymentDto>> getAllPayments() {
-        return ResponseEntity.ok(paymentService.getAllPayments());
+    public ResponseEntity<List<PaymentDto>> getAllPayments(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(paymentService.getAllPayments(page, size));
     }
 
     @GetMapping("/getPaymentByBookingId/{id}")

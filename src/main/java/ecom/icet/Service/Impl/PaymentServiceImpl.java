@@ -10,6 +10,9 @@ import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.PaymentService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,11 +65,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentDto> getAllPayments() {
-        List<Payment> payments = paymentRepository.findAll();
+    public List<PaymentDto> getAllPayments(int page,int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Payment> paymentPage = paymentRepository.findAll(pageable);
         List<PaymentDto> dtoList = new ArrayList<>();
 
-        for (Payment payment : payments){
+        for (Payment payment : paymentPage){
             dtoList.add(mapper.convertValue(payment, PaymentDto.class));
         }
         return dtoList;
