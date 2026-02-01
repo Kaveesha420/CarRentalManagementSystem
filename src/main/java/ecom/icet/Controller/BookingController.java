@@ -22,8 +22,9 @@ public class BookingController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<BookingDto>> getAllBookings() {
-        return ResponseEntity.ok(bookingService.getAllBookings());
+    public ResponseEntity<List<BookingDto>> getAllBookings(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(bookingService.getAllBookings(page, size));
     }
 
     @GetMapping("/getCustomerById/{id}")

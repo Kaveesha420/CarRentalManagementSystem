@@ -8,6 +8,9 @@ import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.UserService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,13 +40,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        List<User> userList = userRepository.findAll();
+    public List<UserDto> getAllUsers(int page,int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> userPage = userRepository.findAll(pageable);
         List<UserDto> userDtoList = new ArrayList<>();
-        for (User user : userList) {
-            if(user.getIsActive()){
-                userDtoList.add(mapper.convertValue(user, UserDto.class));
-            }
+
+        for (User user : userPage){
+            userDtoList.add(mapper.convertValue(user, UserDto.class));
         }
         return userDtoList;
     }

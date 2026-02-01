@@ -22,8 +22,8 @@ public class CustomerController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<CustomerDto>> getAllCustomers(){
-        return ResponseEntity.ok(customerService.getAllCustomers());
+    public ResponseEntity<List<CustomerDto>> getAllCustomers(@RequestParam(defaultValue = "0")int page,@RequestParam(defaultValue = "10")int size){
+        return ResponseEntity.ok(customerService.getAllCustomers(page, size));
     }
 
     @GetMapping("/getCustomerById/{id}")

@@ -24,8 +24,8 @@ public class UserController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<UserDto>> getAllUsers(){
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(userService.getAllUsers(page, size));
     }
 
     @GetMapping("/getById/{id}")

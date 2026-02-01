@@ -23,8 +23,8 @@ public class CarController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<CarDto>> getAllCars(){
-        return ResponseEntity.ok(carService.getAllCars());
+    public ResponseEntity<List<CarDto>> getAllCars(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(carService.getAllCars(page, size));
     }
 
     @GetMapping("/getById/{id}")

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DriverService {
     DriverDto addDriver(DriverDto driverDto);
-    List<DriverDto> getAllDrivers();
+    List<DriverDto> getAllDrivers(int page,int size);
     List<DriverDto> getAvailableDrivers();
     DriverDto updateDriver(String id, DriverDto driverDto);
     void deleteDriver(String id);

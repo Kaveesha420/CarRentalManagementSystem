@@ -8,6 +8,9 @@ import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.DriverService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,10 +39,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<DriverDto> getAllDrivers() {
-        List<Driver> allDrivers = driverRepository.findAll();
+    public List<DriverDto> getAllDrivers(int page,int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Driver> driverPage = driverRepository.findAll(pageable);
         List<DriverDto> driverDto = new ArrayList<>();
-        for (Driver driver: allDrivers){
+
+        for (Driver driver : driverPage){
             driverDto.add(mapper.convertValue(driver, DriverDto.class));
         }
         return driverDto;

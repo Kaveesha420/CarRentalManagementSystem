@@ -8,6 +8,9 @@ import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.CarService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,12 +39,13 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarDto> getAllCars() {
-        List<Car> carList = carRepository.findAll();
-        List<CarDto> carDtoList = new ArrayList<>();
+    public List<CarDto> getAllCars(int page,int size) {
 
-        for(Car car: carList){
-            carDtoList.add(objectMapper.convertValue(carList, CarDto.class));
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Car> carPage = carRepository.findAll(pageable);
+        List<CarDto> carDtoList = new ArrayList<>();
+        for (Car car : carPage.getContent()) {
+            carDtoList.add(objectMapper.convertValue(car, CarDto.class));
         }
         return carDtoList;
     }
