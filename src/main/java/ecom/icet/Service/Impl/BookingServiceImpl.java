@@ -8,6 +8,9 @@ import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.BookingService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,11 +88,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookings() {
-        List<Booking> bookings = bookingRepository.findAll();
-        List<BookingDto> dtoList = new ArrayList<>();
+    public List<BookingDto> getAllBookings(int page,int size) {
 
-        for (Booking booking:bookings){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Booking> bookingPage = bookingRepository.findAll(pageable);
+
+        List<BookingDto> dtoList = new ArrayList<>();
+        for (Booking booking : bookingPage.getContent()){
             dtoList.add(mapper.convertValue(booking, BookingDto.class));
         }
         return dtoList;
