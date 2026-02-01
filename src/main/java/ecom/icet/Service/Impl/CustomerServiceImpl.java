@@ -10,6 +10,9 @@ import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.CustomerService;
 import ecom.icet.Util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,11 +55,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerDto> getAllCustomers() {
-        List<Customer> customerList = customerRepository.findAll();
+    public List<CustomerDto> getAllCustomers(int page,int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
         List<CustomerDto> dtoList = new ArrayList<>();
 
-        for (Customer customer : customerList){
+        for (Customer customer : customerPage){
             dtoList.add(mapper.convertValue(customer, CustomerDto.class));
         }
         return dtoList;
