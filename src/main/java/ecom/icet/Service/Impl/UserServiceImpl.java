@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -25,10 +27,13 @@ public class UserServiceImpl implements UserService {
     private final ObjectMapper mapper;
     private final AuditLogService auditLogService;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public UserDto addUser(UserDto userDto) {
         User user = mapper.convertValue(userDto, User.class);
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User lastUser = userRepository.findFirstByOrderByIdDesc();
         String lastId = (lastUser != null) ? lastUser.getId() : null;
         user.setId(IdGenerator.generateNextId(lastId, "USR"));
