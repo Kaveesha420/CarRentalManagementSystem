@@ -1,5 +1,6 @@
 package ecom.icet.Service;
 
+import ecom.icet.Model.Dto.LoginRequest;
 import ecom.icet.Model.Dto.UserDto;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface UserService {
     Boolean validateUser(String username, String password);
     UserDto updateUser(String id, UserDto userDto);
     void deleteUser(String id);
+
+    String login(LoginRequest loginRequest);
 }
