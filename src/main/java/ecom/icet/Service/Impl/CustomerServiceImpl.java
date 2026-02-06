@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,11 +29,14 @@ public class CustomerServiceImpl implements CustomerService {
     private final ObjectMapper mapper;
     private final AuditLogService auditLogService;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public CustomerDto addCustomer(CustomerDto customerDto) {
         Customer customer = mapper.convertValue(customerDto, Customer.class);
 
         if (customer.getUser() != null) {
+            customer.getUser().setPassword(passwordEncoder.encode(customer.getUser().getPassword()));
             User lastUser = userRepository.findFirstByOrderByIdDesc();
             String lastUserId = (lastUser != null) ? lastUser.getId() : null;
 
