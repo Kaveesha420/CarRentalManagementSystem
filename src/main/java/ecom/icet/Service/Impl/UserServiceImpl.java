@@ -1,12 +1,14 @@
 package ecom.icet.Service.Impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ecom.icet.Model.Dto.LoginRequest;
 import ecom.icet.Model.Dto.UserDto;
 import ecom.icet.Model.Entity.User;
 import ecom.icet.Repository.UserRepository;
 import ecom.icet.Service.AuditLogService;
 import ecom.icet.Service.UserService;
 import ecom.icet.Util.IdGenerator;
+import ecom.icet.Util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ObjectMapper mapper;
     private final AuditLogService auditLogService;
-
+    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -106,6 +108,18 @@ public class UserServiceImpl implements UserService {
             userRepository.save(u);
 
             auditLogService.logAction("DELETE", "Deactivated User: " + u.getUsername());
+        }
+    }
+
+    @Override
+    public String login(LoginRequest loginRequest) {
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            return jwtUtil.generateToken(user.getUsername());
+        } else {
+            throw new IllegalArgumentException("Invalid password");
         }
     }
 }
