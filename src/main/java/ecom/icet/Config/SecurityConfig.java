@@ -33,6 +33,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/user/add").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        .requestMatchers("/car/add", "/car/update", "/car/delete/**").hasAuthority("ADMIN")
+                        .requestMatchers("/user/**").hasAuthority("ADMIN") // User ලව manage කරන්න පුළුවන් Admin ට විතරයි
+
+                        .requestMatchers("/booking/add").hasAuthority("CUSTOMER")
+
+                        .requestMatchers("/car/get-all", "/car/search/**").hasAnyAuthority("ADMIN", "CUSTOMER")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
