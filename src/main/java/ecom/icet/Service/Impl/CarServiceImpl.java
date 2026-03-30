@@ -39,15 +39,12 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarDto> getAllCars(int page,int size) {
-
+    public Page<CarDto> getAllCars(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Car> carPage = carRepository.findAll(pageable);
-        List<CarDto> carDtoList = new ArrayList<>();
-        for (Car car : carPage.getContent()) {
-            carDtoList.add(objectMapper.convertValue(car, CarDto.class));
-        }
-        return carDtoList;
+
+        // carPage එක ඇතුළේ තියෙන Cars ටික CarDto වලට map කරන ලස්සනම විදිහ මෙන්න
+        return carPage.map(car -> objectMapper.convertValue(car, CarDto.class));
     }
 
     @Override

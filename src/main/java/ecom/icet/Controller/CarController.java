@@ -4,6 +4,7 @@ import ecom.icet.Model.Dto.CarDto;
 import ecom.icet.Service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,9 @@ public class CarController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<CarDto>> getAllCars(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<CarDto>> getAllCars(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(carService.getAllCars(page, size));
     }
 
