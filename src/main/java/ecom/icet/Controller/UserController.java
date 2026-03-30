@@ -34,11 +34,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> validateUser(@RequestBody Map<String, String> loginData) {
+    public ResponseEntity<String> validateUser(@RequestBody Map<String, String> loginData) {
         String username = loginData.get("username");
         String password = loginData.get("password");
 
-        Boolean isValid = userService.validateUser(username, password);
+        boolean isValid = userService.validateUser(username, password);
         if (isValid) {
             return ResponseEntity.ok("Login Successful");
         } else {

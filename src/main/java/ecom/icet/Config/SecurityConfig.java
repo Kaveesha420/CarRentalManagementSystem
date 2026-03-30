@@ -33,18 +33,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        String admin = "ADMIN";
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/user/add").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/car/getAll").permitAll()
 
-                        .requestMatchers("/car/add", "/car/update", "/car/delete/**").hasAuthority("ADMIN")
-                        .requestMatchers("/user/**").hasAuthority("ADMIN")
+                        .requestMatchers("/car/add", "/car/update", "/car/delete/**").hasAuthority(admin)
+                        .requestMatchers("/user/**").hasAuthority(admin)
 
                         .requestMatchers("/booking/add").hasAuthority("CUSTOMER")
 
-                        .requestMatchers("/car/get-all", "/car/search/**").hasAnyAuthority("ADMIN", "CUSTOMER")
+                        .requestMatchers("/car/search/**").hasAnyAuthority(admin, "CUSTOMER")
 
                         .anyRequest().authenticated()
                 )
@@ -73,4 +76,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
