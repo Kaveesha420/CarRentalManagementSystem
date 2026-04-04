@@ -69,7 +69,7 @@ public class DriverServiceImpl implements DriverService {
             driver.setName(driverDto.getName());
             driver.setStatus(driverDto.getStatus());
             driver.setContactNo(driverDto.getContactNo());
-//            driver.setLicenseNo(driverDto.getLicenseNo());
+            driver.setLicenseNo(driverDto.getLicenseNo());
             Driver updateDriver = driverRepository.save(driver);
             auditLogService.logAction("UPDATE", "Updated Driver info: " + id);
             return mapper.convertValue(updateDriver, DriverDto.class);
