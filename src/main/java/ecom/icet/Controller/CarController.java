@@ -5,10 +5,12 @@ import ecom.icet.Service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/car")
@@ -18,9 +20,20 @@ public class CarController {
 
     private final CarService carService;
 
-    @PostMapping("/add")
-    public ResponseEntity<CarDto> addCar(@Valid @RequestBody CarDto carDto){
-        return ResponseEntity.ok(carService.addCar(carDto));
+
+    @PostMapping(value = "/add", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<CarDto> addCar(
+            @RequestPart("car") @Valid CarDto carDto,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+        return ResponseEntity.ok(carService.addCar(carDto, file));
+    }
+
+    @PutMapping(value = "/update/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<CarDto> updateCar(
+            @PathVariable String id,
+            @RequestPart("car") @Valid CarDto carDto,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+        return ResponseEntity.ok(carService.updateCar(id, carDto, file));
     }
 
     @GetMapping("/getAll")
@@ -30,19 +43,14 @@ public class CarController {
         return ResponseEntity.ok(carService.getAllCars(page, size));
     }
 
-    @GetMapping("/getById/{id}")
-    public ResponseEntity<CarDto> getCarById(@PathVariable String id){
-        return ResponseEntity.ok(carService.getCarById(id));
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<CarDto> updateCar(@PathVariable String id,@Valid @RequestBody CarDto carDto){
-        return ResponseEntity.ok(carService.updateCar(id, carDto));
-    }
-
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteCar(@PathVariable String id){
+    public ResponseEntity<String> deleteCar(@PathVariable String id) {
         carService.deleteCar(id);
         return ResponseEntity.ok("Car Deleted Successfully");
+    }
+
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<CarDto> getCarById(@PathVariable String id) {
+        return ResponseEntity.ok(carService.getCarById(id));
     }
 }
