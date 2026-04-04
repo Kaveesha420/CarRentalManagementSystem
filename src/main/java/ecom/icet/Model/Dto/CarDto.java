@@ -33,4 +33,8 @@ public class CarDto {
 
     @NotBlank(message = "Status is required")
     private String status;
+
+    private String category;
+
+    private String transmission;
 }
