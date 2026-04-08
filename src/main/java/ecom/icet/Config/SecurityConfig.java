@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,17 +38,17 @@ public class SecurityConfig {
         String admin = "ADMIN";
 
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/user/add").permitAll()
+                        .requestMatchers("/auth/**", "/user/add", "/uploads/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/car/getAll").permitAll()
 
-                        .requestMatchers("/car/add", "/car/update", "/car/delete/**").hasAuthority(admin)
                         .requestMatchers("/user/**").hasAuthority(admin)
-
-                        .requestMatchers("/booking/add").hasAuthority("CUSTOMER")
-
-                        .requestMatchers("/car/search/**").hasAnyAuthority(admin, "CUSTOMER")
+                        .requestMatchers("/driver/**").hasAuthority(admin)
+                        .requestMatchers("/car/add", "/car/update/**", "/car/delete/**").hasAuthority(admin)
+                        .requestMatchers("/booking/getAll", "/booking/updateStatus/**").hasAuthority(admin)
 
                         .anyRequest().authenticated()
                 )

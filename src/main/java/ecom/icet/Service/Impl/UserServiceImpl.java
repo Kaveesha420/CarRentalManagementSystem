@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -117,7 +118,15 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return jwtUtil.generateToken(user.getUsername());
+
+            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .authorities(user.getRole())
+                    .build();
+
+            return jwtUtil.generateToken(userDetails);
+
         } else {
             throw new IllegalArgumentException("Invalid password");
         }

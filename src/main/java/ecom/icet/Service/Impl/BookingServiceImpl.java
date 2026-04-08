@@ -41,15 +41,15 @@ public class BookingServiceImpl implements BookingService {
         );
 
         if (isCarBooked) {
-            throw new RuntimeException("Car is already booked for the selected dates!");
+            throw new IllegalArgumentException("Car is already booked for the selected dates!");
         }
 
-        if (bookingDto.getWithDriver() && bookingDto.getDriverId() != null) {
+        if (Boolean.TRUE.equals(bookingDto.getWithDriver()) && bookingDto.getDriverId() != null) {
             boolean isDriverBooked = bookingRepository.existsByDriverIdAndDateRange(
                     bookingDto.getDriverId(), bookingDto.getPickupDate(), bookingDto.getReturnDate()
             );
             if (isDriverBooked) {
-                throw new RuntimeException("Selected Driver is unavailable for these dates!");
+                throw new IllegalArgumentException("Selected Driver is unavailable for these dates!");
             }
         }
 
@@ -88,16 +88,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookings(int page,int size) {
-
+    public Page<BookingDto> getAllBookings(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Booking> bookingPage = bookingRepository.findAll(pageable);
-
-        List<BookingDto> dtoList = new ArrayList<>();
-        for (Booking booking : bookingPage.getContent()){
-            dtoList.add(mapper.convertValue(booking, BookingDto.class));
-        }
-        return dtoList;
+        // Page එක කෙලින්ම Map කරලා යවනවා
+        return bookingRepository.findAll(pageable).map(booking -> mapper.convertValue(booking, BookingDto.class));
     }
 
     @Override
