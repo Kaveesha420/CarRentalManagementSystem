@@ -27,7 +27,7 @@ public class DriverController {
         return ResponseEntity.ok(driverService.getAllDrivers(page, size));
     }
 
-    @GetMapping("/getAvailable")
+    @GetMapping("/get-available")
     public ResponseEntity<List<DriverDto>> getAvailableDrivers(){
         return ResponseEntity.ok(driverService.getAvailableDrivers());
     }

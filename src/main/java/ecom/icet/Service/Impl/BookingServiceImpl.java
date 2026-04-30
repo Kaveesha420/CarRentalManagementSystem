@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,39 +36,21 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto addBooking(BookingDto bookingDto) {
-
-        boolean isCarBooked = bookingRepository.existsByCarIdAndDateRange(
+        boolean isBooked = bookingRepository.existsByCarIdAndDateRange(
                 bookingDto.getCarId(), bookingDto.getPickupDate(), bookingDto.getReturnDate()
         );
-
-        if (isCarBooked) {
-            throw new RuntimeException("Car is already booked for the selected dates!");
-        }
-
-        if (bookingDto.getWithDriver() && bookingDto.getDriverId() != null) {
-            boolean isDriverBooked = bookingRepository.existsByDriverIdAndDateRange(
-                    bookingDto.getDriverId(), bookingDto.getPickupDate(), bookingDto.getReturnDate()
-            );
-            if (isDriverBooked) {
-                throw new RuntimeException("Selected Driver is unavailable for these dates!");
-            }
-        }
+        if (isBooked) throw new RuntimeException("Car is unavailable for selected dates.");
 
         Booking booking = new Booking();
+        Car car = carRepository.findById(bookingDto.getCarId()).orElseThrow();
+        User user = userRepository.findById(bookingDto.getUserId()).orElseThrow();
 
-        Car car = carRepository.findById(bookingDto.getCarId()).orElseThrow(() -> new RuntimeException("Car not found"));
-        Customer customer = customerRepository.findById(bookingDto.getCustomerId()).orElseThrow(() -> new RuntimeException("Customer not found"));
-        User user = userRepository.findById(bookingDto.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+        Customer customer = customerRepository.findByUserId(bookingDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Customer profile not found for this user."));
 
         booking.setCar(car);
         booking.setCustomer(customer);
         booking.setUser(user);
-
-        if (bookingDto.getDriverId() != null && !bookingDto.getDriverId().isEmpty()) {
-            Driver driver = driverRepository.findById(bookingDto.getDriverId()).orElse(null);
-            booking.setDriver(driver);
-        }
-
         booking.setPickupDate(bookingDto.getPickupDate());
         booking.setReturnDate(bookingDto.getReturnDate());
         booking.setWithDriver(bookingDto.getWithDriver());
@@ -75,29 +58,26 @@ public class BookingServiceImpl implements BookingService {
         booking.setBookingStatus("PENDING");
 
         long days = ChronoUnit.DAYS.between(bookingDto.getPickupDate(), bookingDto.getReturnDate());
-        booking.setTotalPrice(days * car.getPricePerDay());
+        if (days <= 0) days = 1;
 
-        Booking lastBooking = bookingRepository.findFirstByOrderByIdDesc();
-        String lastId = (lastBooking != null) ? lastBooking.getId() : null;
-        booking.setId(IdGenerator.generateNextId(lastId, "BKG"));
+        double total = days * car.getPricePerDay();
+        if (Boolean.TRUE.equals(bookingDto.getWithDriver())) {
+            total += (days * 3000.0);
+        }
+        booking.setTotalPrice(total);
 
-        Booking savedBooking = bookingRepository.save(booking);
-        auditLogService.logAction("CREATE", "New Booking placed: " + savedBooking.getId() + " for Car " + savedBooking.getCar().getId());
-        return mapper.convertValue(savedBooking, BookingDto.class);
+        // ID Generation
+        Booking last = bookingRepository.findFirstByOrderByIdDesc();
+        booking.setId(IdGenerator.generateNextId(last != null ? last.getId() : null, "BKG"));
 
+        return mapper.convertValue(bookingRepository.save(booking), BookingDto.class);
     }
 
     @Override
-    public List<BookingDto> getAllBookings(int page,int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Booking> bookingPage = bookingRepository.findAll(pageable);
-
-        List<BookingDto> dtoList = new ArrayList<>();
-        for (Booking booking : bookingPage.getContent()){
-            dtoList.add(mapper.convertValue(booking, BookingDto.class));
-        }
-        return dtoList;
+    public Page<BookingDto> getAllBookings(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        // Page derect map
+        return bookingRepository.findAll(pageable).map(booking -> mapper.convertValue(booking, BookingDto.class));
     }
 
     @Override
@@ -122,5 +102,26 @@ public class BookingServiceImpl implements BookingService {
             return mapper.convertValue(updated, BookingDto.class);
         }
         return null;
+    }
+
+    @Override
+    @Transactional
+    public BookingDto assignDriver(String bookingId, String driverId) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        booking.setDriver(driver);
+        booking.setBookingStatus("CONFIRMED");
+
+        Booking updated = bookingRepository.save(booking);
+
+
+        auditLogService.logAction("UPDATE", "Driver " + driverId + " assigned to booking " + bookingId);
+
+        return mapper.convertValue(updated, BookingDto.class);
     }
 }

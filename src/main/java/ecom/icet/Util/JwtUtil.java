@@ -1,5 +1,6 @@
 package ecom.icet.Util;
 
+import ecom.icet.Model.Entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,12 +18,14 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-
     private static final String SECRET = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
 
-    public String generateToken(String username) {
+
+    public String generateToken(UserDetails userDetails , String userId) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+        claims.put("id", userId);
+        return createToken(claims, userDetails.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
