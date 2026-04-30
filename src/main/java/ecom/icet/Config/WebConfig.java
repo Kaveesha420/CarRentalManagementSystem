@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // browser requests map to our folder /uploads/** requests,
+        // browser requests map to folder /uploads/** requests,
         Path uploadDir = Paths.get("src/main/resources/static/uploads");
         String uploadPath = uploadDir.toFile().getAbsolutePath();
 

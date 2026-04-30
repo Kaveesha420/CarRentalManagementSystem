@@ -4,6 +4,7 @@ import ecom.icet.Model.Dto.UserDto;
 import ecom.icet.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size){
+    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
         return ResponseEntity.ok(userService.getAllUsers(page, size));
     }
 

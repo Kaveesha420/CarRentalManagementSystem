@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public List<DriverDto> getAllDrivers(int page,int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Driver> driverPage = driverRepository.findAll(pageable);
         List<DriverDto> driverDto = new ArrayList<>();
 
@@ -55,7 +56,7 @@ public class DriverServiceImpl implements DriverService {
         List<Driver> availableDrivers = driverRepository.findByStatus("AVAILABLE");
         List<DriverDto> dtoList = new ArrayList<>();
         for (Driver driver:availableDrivers){
-            dtoList.add(mapper.convertValue(availableDrivers, DriverDto.class));
+            dtoList.add(mapper.convertValue(driver, DriverDto.class));
         }
         return dtoList;
     }

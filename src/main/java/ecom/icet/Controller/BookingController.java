@@ -37,5 +37,11 @@ public class BookingController {
     public ResponseEntity<BookingDto> updateBookingStatus(@PathVariable String id, @PathVariable String status) {
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, status));
     }
+
+    // BookingController_5.java ඇතුළත
+    @PutMapping("/assignDriver/{bookingId}/{driverId}")
+    public ResponseEntity<BookingDto> assignDriver(@PathVariable String bookingId, @PathVariable String driverId) {
+        return ResponseEntity.ok(bookingService.assignDriver(bookingId, driverId));
+    }
 }
 

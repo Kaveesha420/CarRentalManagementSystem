@@ -10,4 +10,5 @@ public interface BookingService {
     Page<BookingDto> getAllBookings(int page, int size);
     List<BookingDto> getBookingsByCustomerId(String customerId);
     BookingDto updateBookingStatus(String id,String status);
+    BookingDto assignDriver(String bookingId, String driverId);
 }

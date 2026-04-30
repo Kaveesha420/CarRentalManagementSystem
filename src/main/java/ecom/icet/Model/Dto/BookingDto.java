@@ -28,9 +28,12 @@ public class BookingDto {
     @NotNull(message = "Car ID is required")
     private String carId;
 
-    @NotNull(message = "Customer ID is required")
     private String customerId;
 
-    private String driverId;
+    @NotNull(message = "User ID is required")
     private String userId;
+    // UI show
+    private String carName;
+    private String customerName;
+
 }
